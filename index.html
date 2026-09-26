@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>芊芊和万万的存钱罐</title>
+  <style>
+    :root {
+      --bg: #fbf6ee;
+      --qian: #f04b5d;
+      --wan: #3b86f6;
+      --accent: var(--qian);
+      --gold: #f5c542;
+      --gold-deep: #e8a91a;
+      --text: #3d2c28;
+      --muted: #9a8b84;
+      --card: #fffdf8;
+      --shadow: 0 8px 24px rgba(70, 40, 20, 0.08);
+      --safe-t: env(safe-area-inset-top, 0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+    }
+
+    .app {
+      height: 100dvh;
+      height: 100svh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 0.2vh;
+      padding: calc(6px + var(--safe-t)) 8px calc(6px + var(--safe-b));
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .kids {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .kid {
+      appearance: none;
+      border: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 6px 10px 6px 12px;
+      border-radius: 18px;
+      background: #fff;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font: inherit;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .kid:active { transform: scale(0.98); }
+
+    .kid .avatar { font-size: 1.35rem; line-height: 1; }
+    .kid .name {
+      font-size: 1.12rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .kid .budget {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      background: #f3eee6;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      min-width: 48px;
+      justify-content: center;
+    }
+
+    .kid .budget .yen {
+      pointer-events: none;
+    }
+
+    .kid .budget input {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      margin: 0;
+      padding: 0;
+      font: inherit;
+      font-weight: 700;
+      color: inherit;
+      width: 2.4ch;
+      min-width: 1.2ch;
+      max-width: 5ch;
+      text-align: left;
+      outline: none;
+      caret-color: currentColor;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .kid.is-on { color: #fff; }
+    .kid.is-on[data-kid="qianqian"] { background: var(--qian); }
+    .kid.is-on[data-kid="wanwan"] { background: var(--wan); }
+    .kid.is-on .budget { background: rgba(255, 255, 255, 0.95); }
+    .kid.is-on[data-kid="qianqian"] .budget { color: var(--qian); }
+    .kid.is-on[data-kid="wanwan"] .budget { color: var(--wan); }
+
+    .stage {
+      position: relative;
+      min-height: 0;
+    }
+
+    .cats {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .jar {
+      position: absolute;
+      left: 50%;
+      bottom: 1.2%;
+      transform: translateX(-50%);
+      width: min(72%, 36dvh);
+      height: auto;
+      aspect-ratio: 1 / 1.12;
+      touch-action: none;
+      cursor: grab;
+      z-index: 1;
+    }
+
+    .jar:active, .jar.is-held { cursor: grabbing; }
+
+    .ledger-btn {
+      position: absolute;
+      z-index: 3;
+      right: 8px;
+      bottom: 10%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: 0;
+      padding: 4px;
+      margin: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .ledger-btn:active { transform: scale(0.96); }
+
+    .ledger-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      font-size: 1.45rem;
+    }
+
+    .ledger-label {
+      font-size: 0.72rem;
+      color: #6d5e57;
+      font-weight: 600;
+    }
+
+    .ledger-list {
+      max-height: min(56vh, 440px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -4px;
+    }
+
+    .ledger-item {
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .ledger-item + .ledger-item {
+      border-top: 1px solid #f0e6d8;
+    }
+
+    .ledger-del {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 64px;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      background: #f04b5d;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .ledger-del svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
+    .ledger-empty {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 22px 8px 12px;
+    }
+
+    .ledger-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 8px;
+      background: var(--card);
+    }
+
+    .ledger-row .ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(70, 40, 20, 0.08), 0 0 0 2px color-mix(in srgb, var(--kid, #d8ccc4) 42%, #fff);
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      flex: 0 0 auto;
+    }
+
+    .ledger-row .meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .ledger-row.is-qianqian { --kid: var(--qian); }
+    .ledger-row.is-wanwan { --kid: var(--wan); }
+
+    .ledger-row .who {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      min-width: 0;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .ledger-row .kid-name {
+      flex: 0 0 auto;
+      color: var(--kid, var(--text));
+    }
+
+    .ledger-row .cat-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ledger-row .sub {
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ledger-row .amt {
+      font-weight: 800;
+      color: var(--kid, var(--qian));
+      flex: 0 0 auto;
+    }
+
+    .slot {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 28%;
+      height: 5.5%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      border-radius: 999px;
+      z-index: 2;
+      transition: background 0.25s;
+    }
+
+    .body {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 4.2%;
+      bottom: 0;
+      background: #fff;
+      border: 6px solid var(--accent);
+      border-radius: 36% 36% 32% 32% / 20% 20% 22% 22%;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(70, 40, 20, 0.08);
+      transition: border-color 0.25s;
+    }
+
+    .fill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 100%;
+      background: linear-gradient(180deg, #ffe27a 0%, var(--gold) 55%, var(--gold-deep) 100%);
+      transition: height 0.55s cubic-bezier(.22, .9, .28, 1), opacity 0.25s ease;
+    }
+
+    .fill::before {
+      content: "";
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      top: -10px;
+      height: 22px;
+      background: #ffe98d;
+      border-radius: 50%;
+    }
+
+    .bubble {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 50%;
+    }
+    .bubble.a { width: 14px; height: 14px; left: 18%; bottom: 28%; }
+    .bubble.b { width: 9px; height: 9px; left: 30%; bottom: 46%; }
+    .bubble.c { width: 11px; height: 11px; right: 22%; bottom: 36%; }
+
+    .shine {
+      position: absolute;
+      left: 10%;
+      top: 12%;
+      width: 16%;
+      height: 42%;
+      background: linear-gradient(180deg, rgba(255,255,255,.55), transparent);
+      border-radius: 40px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .face {
+      position: absolute;
+      left: 50%;
+      top: 32%;
+      width: 54%;
+      height: 22%;
+      transform: translateX(-50%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .eye {
+      position: absolute;
+      top: 18%;
+      width: 11px;
+      height: 11px;
+      background: var(--accent);
+      border-radius: 50%;
+      transition: background 0.25s;
+    }
+    .eye.l { left: 18%; }
+    .eye.r { right: 18%; }
+
+    .blush {
+      position: absolute;
+      top: 48%;
+      width: 16px;
+      height: 10px;
+      background: color-mix(in srgb, var(--accent) 35%, transparent);
+      border-radius: 50%;
+    }
+    .blush.l { left: 6%; }
+    .blush.r { right: 6%; }
+
+    .mouth {
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      width: 22px;
+      height: 12px;
+      transform: translateX(-50%);
+      border: 3px solid var(--accent);
+      border-top: 0;
+      border-radius: 0 0 16px 16px;
+      transition: border-color 0.25s, height 0.2s, width 0.2s;
+    }
+
+    .jar.is-sad .mouth {
+      top: 64%;
+      height: 10px;
+      width: 18px;
+      border: 0;
+      border-top: 3px solid var(--accent);
+      border-radius: 16px 16px 0 0;
+    }
+
+    .jar.is-empty .mouth {
+      top: 62%;
+      width: 8px;
+      height: 8px;
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .jar-num {
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      transform: translate(-50%, -20%);
+      z-index: 3;
+      font-size: clamp(1.8rem, 8vh, 2.6rem);
+      font-weight: 800;
+      color: #5a3a12;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .spend-float {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      transform: translate(-50%, 0);
+      font-weight: 800;
+      color: var(--accent);
+      font-size: 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .spend-float.go {
+      animation: float-up 0.8s ease forwards;
+    }
+
+    @keyframes float-up {
+      0% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -28px); }
+    }
+
+    .cat {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: 0;
+      padding: 4px;
+      margin: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+      transform-origin: 50% 70%;
+      transition: transform 0.18s ease;
+      width: max-content;
+    }
+
+    .cat-icon {
+      width: var(--cat-size, 50px);
+      height: var(--cat-size, 50px);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      font-size: calc(var(--cat-size, 50px) * 0.42);
+      transition: width 0.18s ease, height 0.18s ease, font-size 0.18s ease, box-shadow 0.15s;
+    }
+
+    .app.is-dragging .cat {
+      transform: translate(-50%, -50%) scale(1.32);
+    }
+
+    .cat span.label {
+      font-size: 0.72rem;
+      color: #6d5e57;
+      font-weight: 600;
+      max-width: 4.6em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cat.is-add .cat-icon {
+      background: transparent;
+      box-shadow: none;
+      border: 2px dashed #cbbfb6;
+      color: #b3a59d;
+      font-weight: 500;
+    }
+
+    .app.is-dragging .cat.is-target {
+      transform: translate(-50%, -50%) scale(1.48);
+    }
+
+    .cat.is-target .cat-icon {
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 55%, white);
+    }
+
+    .icon-pick {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .icon-pick button {
+      appearance: none;
+      border: 1.5px solid transparent;
+      background: #fff;
+      border-radius: 12px;
+      aspect-ratio: 1;
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .icon-pick button.is-on {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 12%, #fff);
+    }
+
+    .cat-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      margin-top: 4px;
+    }
+
+    .ok,
+    .del {
+      appearance: none;
+      border: 0;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .ok svg,
+    .del svg {
+      width: 26px;
+      height: 26px;
+      display: block;
+    }
+
+    .del {
+      background: #f04b5d;
+      box-shadow: 0 8px 16px rgba(240, 75, 93, 0.32);
+    }
+
+    .del[hidden] {
+      display: none;
+    }
+
+    .ok {
+      background: #2ecc71;
+      box-shadow: 0 8px 16px rgba(46, 204, 113, 0.35);
+    }
+
+    .ok:active,
+    .del:active { transform: scale(0.96); }
+
+    #sheetForm .ok {
+      margin: 6px auto 0;
+    }
+
+    .ghost {
+      position: fixed;
+      z-index: 40;
+      width: var(--coin-size, 60px);
+      height: var(--coin-size, 60px);
+      margin: calc(var(--coin-size, 60px) / -2) 0 0 calc(var(--coin-size, 60px) / -2);
+      display: none;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 14px rgba(160, 90, 8, 0.38));
+    }
+
+    .ghost.show { display: block; }
+
+    .ghost svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 38%;
+      transform: translate(-50%, 0);
+      background: #3d2c28;
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 700;
+      display: none;
+      z-index: 80;
+      white-space: nowrap;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      background: rgba(60, 40, 30, 0.08);
+    }
+
+    .overlay.show { display: block; }
+
+    .sheet {
+      position: absolute;
+      left: 50%;
+      top: 14%;
+      width: min(86vw, 340px);
+      transform: translateX(-50%);
+      background: var(--card);
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 16px 40px rgba(40, 20, 10, 0.18);
+    }
+
+    .sheet-cat {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      font-size: 0.86rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .field input {
+      appearance: none;
+      border: 1.5px solid #eadfd4;
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .field input.shake {
+      animation: shake 0.35s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .empty-msg {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      padding: 10px 0 6px;
+    }
+
+    .hint {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="kids">
+      <div class="kid is-on" data-kid="qianqian" role="button" tabindex="0" aria-pressed="true">
+        <span class="avatar">🐯</span>
+        <span class="name">芊芊</span>
+        <label class="budget">
+          <span class="yen">¥</span>
+          <input data-budget inputmode="numeric" maxlength="5" value="50" aria-label="芊芊的预算" />
+        </label>
+      </div>
+      <div class="kid" data-kid="wanwan" role="button" tabindex="0" aria-pressed="false">
+        <span class="avatar">🐰</span>
+        <span class="name">万万</span>
+        <label class="budget">
+          <span class="yen">¥</span>
+          <input data-budget inputmode="numeric" maxlength="5" value="50" aria-label="万万的预算" />
+        </label>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="cats" id="cats"></div>
+      <div class="jar" id="jar" aria-label="存钱罐">
+        <div class="slot"></div>
+        <div class="body">
+          <div class="fill" id="fill">
+            <i class="bubble a"></i>
+            <i class="bubble b"></i>
+            <i class="bubble c"></i>
+          </div>
+          <div class="shine"></div>
+          <div class="face" aria-hidden="true">
+            <span class="eye l"></span>
+            <span class="eye r"></span>
+            <span class="blush l"></span>
+            <span class="blush r"></span>
+            <span class="mouth"></span>
+          </div>
+          <div class="jar-num" id="jarNum">¥50</div>
+          <div class="spend-float" id="spendFloat"></div>
+        </div>
+      </div>
+      <button class="ledger-btn" id="ledgerBtn" type="button" aria-label="账本">
+        <span class="ledger-icon">📒</span>
+        <span class="ledger-label">账本</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="ghost" id="ghost" aria-hidden="true">
+    <svg viewBox="0 0 64 64">
+      <defs>
+        <radialGradient id="coinFace" cx="36%" cy="30%" r="72%">
+          <stop offset="0%" stop-color="#ffe98d" />
+          <stop offset="52%" stop-color="#f5c542" />
+          <stop offset="100%" stop-color="#e09a14" />
+        </radialGradient>
+        <linearGradient id="coinRim" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stop-color="#ffe27a" />
+          <stop offset="100%" stop-color="#c47d0c" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill="url(#coinRim)" />
+      <circle cx="32" cy="32" r="25.2" fill="url(#coinFace)" />
+      <circle cx="32" cy="32" r="25.2" fill="none" stroke="#fff6c4" stroke-width="1.5" opacity="0.55" />
+      <circle cx="32" cy="32" r="20.4" fill="none" stroke="#d49212" stroke-width="1.35" opacity="0.5" />
+      <ellipse cx="24" cy="22" rx="8" ry="11" fill="#fff" opacity="0.22" />
+      <path d="M21 20.5L32 38L43 20.5M32 38v9.5M20.5 29h23M20.5 34.5h23" fill="none" stroke="#c47d0c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <div class="overlay" id="overlay">
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-cat" id="sheetCat"></div>
+      <div id="sheetForm">
+        <label class="field">金额
+          <input id="amount" inputmode="numeric" autocomplete="off" placeholder="输入金额" />
+        </label>
+        <label class="field">备注
+          <input id="note" maxlength="20" autocomplete="off" placeholder="可选" />
+        </label>
+        <button class="ok" type="button" id="confirm" aria-label="确认">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12.5l4.8 4.8L19 7.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="empty-msg" id="emptyMsg" hidden>没钱啦</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="catOverlay">
+    <div class="sheet" id="catSheet" role="dialog" aria-modal="true">
+      <div class="sheet-cat" id="catSheetTitle">新建分类</div>
+      <div class="icon-pick" id="iconPick"></div>
+      <label class="field">名称
+        <input id="catName" maxlength="6" autocomplete="off" placeholder="分类名称" />
+      </label>
+      <div class="cat-actions">
+        <button class="del" type="button" id="catDelete" hidden aria-label="删除">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="ok" type="button" id="catSave" aria-label="确定">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12.5l4.8 4.8L19 7.4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ledgerOverlay">
+    <div class="sheet" id="ledgerSheet" role="dialog" aria-modal="true">
+      <div class="sheet-cat">账本</div>
+      <div class="ledger-list" id="ledgerList"></div>
+    </div>
+  </div>
+
+  <script>
+    const ICONS = ["🍿","🧸","📚","🎮","🥤","🍦","🍪","🎁","👕","🎈","🎨","⚽","🎵","🍕","🍎","🧃","🧩","🚌"];
+    const DEFAULT_CATS = [
+      { id: "snack", name: "零食", icon: "🍿" },
+      { id: "toy", name: "玩具", icon: "🧸" },
+      { id: "book", name: "书本", icon: "📚" },
+      { id: "game", name: "游戏", icon: "🎮" },
+      { id: "drink", name: "冷饮", icon: "🥤" }
+    ];
+    const STORE = "lovely-kids-budget-v1";
+    const BUDGET = 50;
+
+    const state = normalize(load()) || {
+      current: "qianqian",
+      kids: {
+        qianqian: { name: "芊芊", budget: BUDGET, balance: BUDGET },
+        wanwan: { name: "万万", budget: BUDGET, balance: BUDGET }
+      },
+      cats: DEFAULT_CATS.map((c) => Object.assign({}, c)),
+      logs: []
+    };
+
+    const app = document.getElementById("app");
+    const stage = document.getElementById("stage");
+    const catsEl = document.getElementById("cats");
+    const jar = document.getElementById("jar");
+    const fill = document.getElementById("fill");
+    const jarNum = document.getElementById("jarNum");
+    const ghost = document.getElementById("ghost");
+    const overlay = document.getElementById("overlay");
+    const sheet = document.getElementById("sheet");
+    const sheetCat = document.getElementById("sheetCat");
+    const sheetForm = document.getElementById("sheetForm");
+    const emptyMsg = document.getElementById("emptyMsg");
+    const amountEl = document.getElementById("amount");
+    const noteEl = document.getElementById("note");
+    const toastEl = document.getElementById("toast");
+    const spendFloat = document.getElementById("spendFloat");
+    const catOverlay = document.getElementById("catOverlay");
+    const catSheet = document.getElementById("catSheet");
+    const catSheetTitle = document.getElementById("catSheetTitle");
+    const iconPick = document.getElementById("iconPick");
+    const catNameEl = document.getElementById("catName");
+    const catDelete = document.getElementById("catDelete");
+    const catSave = document.getElementById("catSave");
+    const ledgerBtn = document.getElementById("ledgerBtn");
+    const ledgerOverlay = document.getElementById("ledgerOverlay");
+    const ledgerSheet = document.getElementById("ledgerSheet");
+    const ledgerList = document.getElementById("ledgerList");
+
+    let pendingCat = null;
+    let dragging = false;
+    let dragMoved = false;
+    let startX = 0;
+    let startY = 0;
+    let pointerId = null;
+    let toastTimer = 0;
+    let holdTimer = 0;
+    let holdCat = null;
+    let holdStart = null;
+    let catMode = "add";
+    let editingId = null;
+    let pickedIcon = ICONS[0];
+    let spendAfterAdd = false;
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORE);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function normalize(data) {
+      if (!data) return null;
+      if (!Array.isArray(data.cats) || !data.cats.length) {
+        data.cats = DEFAULT_CATS.map((c) => Object.assign({}, c));
+      }
+      if (!Array.isArray(data.logs)) data.logs = [];
+      return data;
+    }
+
+    function save() {
+      try { localStorage.setItem(STORE, JSON.stringify(state)); } catch {}
+    }
+
+    function kid() {
+      return state.kids[state.current];
+    }
+
+    function findCat(id) {
+      return state.cats.find((c) => c.id === id);
+    }
+
+    function overlayOpen() {
+      return overlay.classList.contains("show") || catOverlay.classList.contains("show") || ledgerOverlay.classList.contains("show");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function fmtWhen(ts) {
+      const d = new Date(ts);
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const h = String(d.getHours()).padStart(2, "0");
+      const min = String(d.getMinutes()).padStart(2, "0");
+      return m + "-" + day + " " + h + ":" + min;
+    }
+
+    function renderLedger() {
+      const logs = Array.isArray(state.logs) ? state.logs : [];
+      if (!logs.length) {
+        ledgerList.innerHTML = '<p class="ledger-empty">还没有记账</p>';
+        return;
+      }
+      ledgerList.innerHTML = logs.map((log) => {
+        const kidId = log.kid === "wanwan" ? "wanwan" : log.kid === "qianqian" ? "qianqian" : "";
+        const kidName = kidId && state.kids[kidId] ? state.kids[kidId].name : "";
+        const icon = log.icon || "📦";
+        const catName = escapeHtml(log.name || "分类");
+        const note = log.note
+          ? '<div class="sub">' + escapeHtml(log.note) + "</div>"
+          : "";
+        const who = kidName
+          ? '<span class="kid-name">' + escapeHtml(kidName) + "</span>" +
+            '<span class="cat-name">' + catName + "</span>"
+          : '<span class="cat-name">' + catName + "</span>";
+        const rowClass = "ledger-row" + (kidId ? " is-" + kidId : "");
+        return '<div class="ledger-item" data-log="' + escapeHtml(log.id) + '">' +
+          '<div class="' + rowClass + '">' +
+            '<div class="ico">' + icon + "</div>" +
+            '<div class="meta">' +
+              '<div class="who">' + who + "</div>" +
+              note +
+              '<div class="sub">' + fmtWhen(log.at) + "</div>" +
+            "</div>" +
+            '<div class="amt">−¥' + Number(log.amount).toFixed(0) + "</div>" +
+          "</div>" +
+          '<button class="ledger-del" type="button" aria-label="删除">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+              '<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>' +
+            "</svg>" +
+          "</button>" +
+        "</div>";
+      }).join("");
+    }
+
+    const LEDGER_DEL_W = 64;
+
+    function ledgerRowTx(item) {
+      const row = item && item.querySelector(".ledger-row");
+      if (!row) return 0;
+      const m = /translateX\((-?\d+(?:\.\d+)?)px\)/.exec(row.style.transform || "");
+      if (m) return parseFloat(m[1]);
+      return item.classList.contains("is-open") ? -LEDGER_DEL_W : 0;
+    }
+
+    function setLedgerRowTx(item, x, animate) {
+      const row = item && item.querySelector(".ledger-row");
+      if (!row) return;
+      const px = Math.max(-LEDGER_DEL_W, Math.min(0, x));
+      row.style.transition = animate ? "transform 0.2s ease" : "none";
+      row.style.transform = px ? "translateX(" + px + "px)" : "";
+      item.classList.toggle("is-open", px <= -LEDGER_DEL_W + 0.5);
+    }
+
+    function closeLedgerSwipes(except) {
+      ledgerList.querySelectorAll(".ledger-item.is-open").forEach((el) => {
+        if (el !== except) setLedgerRowTx(el, 0, true);
+      });
+    }
+
+    function deleteLog(id) {
+      if (!id || !Array.isArray(state.logs)) return;
+      const i = state.logs.findIndex((l) => l.id === id);
+      if (i < 0) return;
+      const log = state.logs[i];
+      const amt = Math.round(Number(log.amount) || 0);
+      const owner = log.kid ? state.kids[log.kid] : null;
+      if (owner && amt > 0) owner.balance += amt;
+      state.logs.splice(i, 1);
+      save();
+      render();
+    }
+
+    function openLedger() {
+      renderLedger();
+      ledgerOverlay.classList.add("show");
+    }
+
+    function closeLedger() {
+      ledgerOverlay.classList.remove("show");
+    }
+
+    function fitBudgetInput(el) {
+      const n = Math.max(1, String(el.value || "0").length);
+      el.style.width = (n + 0.4) + "ch";
+    }
+
+    function applyBudget(kidId, raw) {
+      const k = state.kids[kidId];
+      const n = parseInt(String(raw).replace(/\D/g, ""), 10);
+      if (!Number.isFinite(n) || n < 0) return k.budget;
+      const spent = Math.max(0, k.budget - k.balance);
+      k.budget = n;
+      k.balance = Math.max(0, n - spent);
+      save();
+      return n;
+    }
+
+    function render() {
+      const accent = state.current === "qianqian" ? "var(--qian)" : "var(--wan)";
+      document.documentElement.style.setProperty("--accent", accent);
+
+      document.querySelectorAll(".kid").forEach((btn) => {
+        const on = btn.dataset.kid === state.current;
+        btn.classList.toggle("is-on", on);
+        btn.setAttribute("aria-pressed", String(on));
+        const k = state.kids[btn.dataset.kid];
+        const input = btn.querySelector("[data-budget]");
+        if (document.activeElement !== input) {
+          input.value = String(k.budget);
+        }
+        fitBudgetInput(input);
+      });
+
+      const total = kid().budget;
+      const ratio = total > 0 ? Math.max(0, Math.min(1, kid().balance / total)) : 0;
+      fill.style.height = (ratio * 100) + "%";
+      fill.style.opacity = ratio === 0 ? "0" : "1";
+      jarNum.textContent = "¥" + kid().balance;
+      jar.classList.toggle("is-sad", ratio > 0 && ratio < 0.18);
+      jar.classList.toggle("is-empty", ratio === 0);
+      renderLedger();
+    }
+
+    function renderCats() {
+      catsEl.innerHTML = "";
+      state.cats.forEach((c) => {
+        const btn = document.createElement("button");
+        btn.className = "cat";
+        btn.type = "button";
+        btn.dataset.cat = c.id;
+        btn.innerHTML = '<span class="cat-icon"></span><span class="label"></span>';
+        btn.querySelector(".cat-icon").textContent = c.icon;
+        btn.querySelector(".label").textContent = c.name;
+        catsEl.appendChild(btn);
+      });
+      const add = document.createElement("button");
+      add.className = "cat is-add";
+      add.type = "button";
+      add.dataset.cat = "add";
+      add.innerHTML = '<span class="cat-icon">➕</span><span class="label">添加</span>';
+      catsEl.appendChild(add);
+      layoutFan();
+    }
+
+    function placeArc(nodes, cx, yApex, radius, gap, minY, minX, maxX) {
+      const m = nodes.length;
+      if (!m) return;
+      const mid = (m - 1) / 2;
+      nodes.forEach((node, i) => {
+        const dx = (i - mid) * gap;
+        const x = Math.min(maxX, Math.max(minX, cx + dx));
+        const drop = radius > Math.abs(dx)
+          ? radius - Math.sqrt(radius * radius - dx * dx)
+          : 0;
+        node.style.setProperty("--x", x + "px");
+        node.style.setProperty("--y", Math.max(minY, yApex + drop) + "px");
+      });
+    }
+
+    function layoutFan() {
+      const nodes = [...catsEl.querySelectorAll(".cat")];
+      const n = nodes.length;
+      if (!n) return;
+      const sr = stage.getBoundingClientRect();
+      const w = sr.width;
+      const h = sr.height;
+      if (w < 8 || h < 8) {
+        if (layoutFan.tries > 30) return;
+        layoutFan.tries = (layoutFan.tries || 0) + 1;
+        requestAnimationFrame(layoutFan);
+        return;
+      }
+      layoutFan.tries = 0;
+
+      let size = Math.round(Math.min(52, Math.max(40, w / 7.1)));
+      if (n >= 10) size = Math.min(size, 42);
+      if (n >= 14) size = Math.min(size, 36);
+
+      const aspect = 1.12;
+      const bottomPad = Math.max(6, Math.round(h * 0.012));
+      let jarH = h * 0.43;
+      let jarW = jarH / aspect;
+      if (jarW > w * 0.82) {
+        jarW = w * 0.82;
+        jarH = jarW * aspect;
+      }
+      jarH = Math.min(jarH, h * 0.46);
+
+      jar.style.width = Math.round(jarW) + "px";
+      jar.style.height = Math.round(jarH) + "px";
+      jar.style.bottom = bottomPad + "px";
+      stage.style.setProperty("--cat-size", size + "px");
+      document.documentElement.style.setProperty("--coin-size", Math.round(Math.min(size * 1.2, 60)) + "px");
+
+      const cx = w / 2;
+      const jarTop = h - jarH - bottomPad;
+      const rowPitch = size + 44;
+      const yInner = jarTop - size * 0.55 - 22;
+      const minY = size * 0.7 + 8;
+      const gap = size + 36;
+      const minX = size * 0.52;
+      const maxX = w - size * 0.52;
+      const capAt = (half) => Math.max(1, Math.floor((2 * half) / gap) + 1);
+
+      const innerHalf = Math.min(jarW * 0.48, w * 0.36, maxX - cx);
+      const outerHalf = Math.min(cx - minX, jarW * 0.7, maxX - cx);
+      const innerCap = Math.min(3, capAt(innerHalf));
+      const outerCap = capAt(outerHalf);
+
+      const nInner = Math.min(n, innerCap);
+      const nOuter = Math.min(Math.max(0, n - nInner), outerCap);
+      const nThird = Math.max(0, n - nInner - nOuter);
+
+      const yOuter = nOuter || nThird ? Math.max(minY, yInner - rowPitch) : yInner;
+      const yThird = nThird ? Math.max(minY, yOuter - rowPitch) : yOuter;
+      const rInner = Math.max(innerHalf * 1.35, gap * 2);
+      const rOuter = Math.max(outerHalf * 1.2, gap * 3);
+      const rThird = Math.max(outerHalf * 1.35, gap * 3.4);
+
+      let i = 0;
+      placeArc(nodes.slice(i, i += nInner), cx, yInner, rInner, gap, minY, minX, maxX);
+      placeArc(nodes.slice(i, i += nOuter), cx, yOuter, rOuter, gap, minY, minX, maxX);
+      placeArc(nodes.slice(i, i += nThird), cx, yThird, rThird, gap, minY, minX, maxX);
+
+      const btnW = ledgerBtn.offsetWidth || 56;
+      const btnH = ledgerBtn.offsetHeight || 62;
+      ledgerBtn.style.right = Math.max(4, Math.round((w - jarW) / 2 - btnW + 18)) + "px";
+      ledgerBtn.style.bottom = Math.round(bottomPad + jarH * 0.22 - btnH / 2) + "px";
+    }
+
+    function toast(text) {
+      toastEl.textContent = text;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2200);
+    }
+
+    function paintIcons() {
+      iconPick.innerHTML = "";
+      ICONS.forEach((icon) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = icon;
+        if (icon === pickedIcon) b.classList.add("is-on");
+        b.addEventListener("click", () => {
+          pickedIcon = icon;
+          paintIcons();
+        });
+        iconPick.appendChild(b);
+      });
+    }
+
+    function openCatSheet(mode, cat, opts) {
+      catMode = mode;
+      editingId = cat ? cat.id : null;
+      pickedIcon = cat ? cat.icon : ICONS[0];
+      catSheetTitle.textContent = mode === "add" ? "新建分类" : "修改分类";
+      catNameEl.value = cat ? cat.name : "";
+      catDelete.hidden = mode !== "edit";
+      spendAfterAdd = !!(opts && opts.spendAfter);
+      paintIcons();
+      catOverlay.classList.add("show");
+      setTimeout(() => catNameEl.focus(), 40);
+    }
+
+    function closeCatSheet() {
+      catOverlay.classList.remove("show");
+      editingId = null;
+      spendAfterAdd = false;
+      catNameEl.blur();
+    }
+
+    function saveCatSheet() {
+      const name = catNameEl.value.trim();
+      if (!name) {
+        catNameEl.classList.remove("shake");
+        void catNameEl.offsetWidth;
+        catNameEl.classList.add("shake");
+        return;
+      }
+      const chainSpend = spendAfterAdd && catMode === "add";
+      let newId = null;
+      if (catMode === "add") {
+        newId = "c" + Date.now();
+        state.cats.push({
+          id: newId,
+          name: name.slice(0, 6),
+          icon: pickedIcon
+        });
+      } else {
+        const c = findCat(editingId);
+        if (c) {
+          c.name = name.slice(0, 6);
+          c.icon = pickedIcon;
+        }
+      }
+      save();
+      closeCatSheet();
+      renderCats();
+      if (chainSpend && newId) openSheet(newId);
+    }
+
+    function deleteEditingCat() {
+      if (!editingId) return;
+      state.cats = state.cats.filter((c) => c.id !== editingId);
+      save();
+      closeCatSheet();
+      renderCats();
+    }
+
+    function hitCat(x, y) {
+      const el = document.elementFromPoint(x, y);
+      return el ? el.closest("[data-cat]") : null;
+    }
+
+    function clearTargets() {
+      document.querySelectorAll(".cat.is-target").forEach((c) => c.classList.remove("is-target"));
+    }
+
+    function endDrag() {
+      if (pointerId != null && jar.hasPointerCapture(pointerId)) {
+        jar.releasePointerCapture(pointerId);
+      }
+      pointerId = null;
+      dragging = false;
+      dragMoved = false;
+      jar.classList.remove("is-held");
+      ghost.classList.remove("show");
+      ghost.style.display = "none";
+      app.classList.remove("is-dragging");
+      clearTargets();
+    }
+
+    function openSheet(catKey) {
+      const cat = findCat(catKey);
+      if (!cat) return;
+      pendingCat = catKey;
+      overlay.classList.add("show");
+      if (kid().balance <= 0) {
+        sheetCat.textContent = cat.icon + " " + cat.name;
+        sheetForm.hidden = true;
+        emptyMsg.hidden = false;
+        return;
+      }
+      sheetForm.hidden = false;
+      emptyMsg.hidden = true;
+      sheetCat.textContent = cat.icon + " " + cat.name;
+      amountEl.value = "";
+      noteEl.value = "";
+      setTimeout(() => amountEl.focus(), 50);
+    }
+
+    function closeSheet() {
+      overlay.classList.remove("show");
+      pendingCat = null;
+      amountEl.blur();
+      noteEl.blur();
+    }
+
+    function confirmSpend() {
+      if (kid().balance <= 0) {
+        closeSheet();
+        return;
+      }
+      const n = parseInt(String(amountEl.value).replace(/\D/g, ""), 10);
+      if (!n || n <= 0) {
+        amountEl.classList.remove("shake");
+        void amountEl.offsetWidth;
+        amountEl.classList.add("shake");
+        return;
+      }
+      if (n > kid().balance) {
+        amountEl.classList.remove("shake");
+        void amountEl.offsetWidth;
+        amountEl.classList.add("shake");
+        toast("只剩 ¥" + kid().balance);
+        return;
+      }
+      const cat = findCat(pendingCat);
+      kid().balance -= n;
+      if (!Array.isArray(state.logs)) state.logs = [];
+      state.logs.unshift({
+        id: "l" + Date.now(),
+        kid: state.current,
+        catId: pendingCat,
+        name: cat ? cat.name : "",
+        icon: cat ? cat.icon : "📦",
+        amount: n,
+        note: noteEl.value.trim(),
+        at: Date.now()
+      });
+      save();
+      spendFloat.textContent = "-¥" + n;
+      spendFloat.classList.remove("go");
+      void spendFloat.offsetWidth;
+      spendFloat.classList.add("go");
+      closeSheet();
+      render();
+      if (navigator.vibrate) navigator.vibrate(12);
+    }
+
+    jar.addEventListener("pointerdown", (e) => {
+      if (overlayOpen()) return;
+      if (e.button) return;
+      e.preventDefault();
+      dragging = true;
+      dragMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      pointerId = e.pointerId;
+      jar.classList.add("is-held");
+      jar.setPointerCapture(e.pointerId);
+    });
+
+    jar.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!dragMoved && Math.hypot(dx, dy) < 12) return;
+      dragMoved = true;
+      app.classList.add("is-dragging");
+      ghost.classList.add("show");
+      ghost.style.display = "block";
+      ghost.style.left = e.clientX + "px";
+      ghost.style.top = e.clientY + "px";
+      clearTargets();
+      const cat = hitCat(e.clientX, e.clientY);
+      if (cat) cat.classList.add("is-target");
+    });
+
+    function dropAt(x, y) {
+      const cat = hitCat(x, y);
+      endDrag();
+      if (!cat) return;
+      const key = cat.dataset.cat;
+      if (key === "add") {
+        openCatSheet("add", null, { spendAfter: true });
+        return;
+      }
+      openSheet(key);
+    }
+
+    jar.addEventListener("pointerup", (e) => {
+      if (!dragging) return;
+      if (!dragMoved) {
+        endDrag();
+        return;
+      }
+      dropAt(e.clientX, e.clientY);
+    });
+
+    jar.addEventListener("pointercancel", () => {
+      if (dragging) endDrag();
+    });
+
+    document.querySelectorAll(".kid").forEach((card) => {
+      const input = card.querySelector("[data-budget]");
+
+      card.addEventListener("click", (e) => {
+        if (overlayOpen()) return;
+        if (e.target.closest(".budget")) return;
+        state.current = card.dataset.kid;
+        save();
+        render();
+      });
+
+      card.addEventListener("keydown", (e) => {
+        if (e.target === input) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        state.current = card.dataset.kid;
+        save();
+        render();
+      });
+
+      input.addEventListener("pointerdown", (e) => e.stopPropagation());
+
+      input.addEventListener("focus", () => {
+        if (state.current !== card.dataset.kid) {
+          state.current = card.dataset.kid;
+          save();
+          render();
+        }
+        requestAnimationFrame(() => input.select());
+      });
+
+      input.addEventListener("input", () => {
+        input.value = input.value.replace(/\D/g, "");
+        fitBudgetInput(input);
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          input.blur();
+        }
+        if (e.key === "Escape") {
+          input.value = String(state.kids[card.dataset.kid].budget);
+          input.blur();
+        }
+      });
+
+      input.addEventListener("blur", () => {
+        input.value = String(applyBudget(card.dataset.kid, input.value));
+        render();
+      });
+    });
+
+    function clearHold() {
+      clearTimeout(holdTimer);
+      holdTimer = 0;
+      holdCat = null;
+      holdStart = null;
+    }
+
+    catsEl.addEventListener("pointerdown", (e) => {
+      if (overlayOpen() || dragging) return;
+      const cat = e.target.closest("[data-cat]");
+      if (!cat) return;
+      holdCat = cat;
+      holdStart = { x: e.clientX, y: e.clientY };
+      if (cat.dataset.cat === "add") return;
+      holdTimer = setTimeout(() => {
+        const c = findCat(cat.dataset.cat);
+        holdTimer = 0;
+        if (c) openCatSheet("edit", c);
+      }, 480);
+    });
+
+    catsEl.addEventListener("pointermove", (e) => {
+      if (!holdStart) return;
+      if (Math.hypot(e.clientX - holdStart.x, e.clientY - holdStart.y) > 12) {
+        clearHold();
+      }
+    });
+
+    catsEl.addEventListener("pointerup", (e) => {
+      const cat = holdCat;
+      const wasHold = holdTimer;
+      const start = holdStart;
+      clearTimeout(holdTimer);
+      holdTimer = 0;
+      holdCat = null;
+      holdStart = null;
+      if (!cat || overlayOpen() || dragging) return;
+      if (cat.dataset.cat === "add" && start && Math.hypot(e.clientX - start.x, e.clientY - start.y) < 12) {
+        openCatSheet("add");
+      }
+      if (wasHold) {
+        /* short tap on existing cat does nothing */
+      }
+    });
+
+    catsEl.addEventListener("pointercancel", clearHold);
+    catsEl.addEventListener("lostpointercapture", clearHold);
+
+    overlay.addEventListener("pointerdown", (e) => {
+      if (!sheet.contains(e.target)) closeSheet();
+    });
+
+    catOverlay.addEventListener("pointerdown", (e) => {
+      if (!catSheet.contains(e.target)) closeCatSheet();
+    });
+
+    ledgerBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (dragging) return;
+      openLedger();
+    });
+
+    let ledgerSwipe = null;
+
+    ledgerList.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".ledger-del")) return;
+      const item = e.target.closest(".ledger-item");
+      if (!item) return;
+      closeLedgerSwipes(item);
+      ledgerSwipe = {
+        item,
+        startX: e.clientX,
+        startY: e.clientY,
+        base: ledgerRowTx(item),
+        axis: null,
+        pid: e.pointerId
+      };
+    });
+
+    ledgerList.addEventListener("pointermove", (e) => {
+      if (!ledgerSwipe || e.pointerId !== ledgerSwipe.pid) return;
+      const dx = e.clientX - ledgerSwipe.startX;
+      const dy = e.clientY - ledgerSwipe.startY;
+      if (!ledgerSwipe.axis) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        ledgerSwipe.axis = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+        if (ledgerSwipe.axis === "h") {
+          try { ledgerList.setPointerCapture(e.pointerId); } catch {}
+        }
+      }
+      if (ledgerSwipe.axis !== "h") return;
+      e.preventDefault();
+      setLedgerRowTx(ledgerSwipe.item, ledgerSwipe.base + dx, false);
+    });
+
+    function finishLedgerSwipe(e) {
+      if (!ledgerSwipe || (e && e.pointerId !== ledgerSwipe.pid)) return;
+      const item = ledgerSwipe.item;
+      const axis = ledgerSwipe.axis;
+      const moved = e
+        ? Math.hypot(e.clientX - ledgerSwipe.startX, e.clientY - ledgerSwipe.startY)
+        : 0;
+      const x = ledgerRowTx(item);
+      if (!axis && moved < 8 && item.classList.contains("is-open")) {
+        setLedgerRowTx(item, 0, true);
+      } else if (axis === "h") {
+        setLedgerRowTx(item, x <= -LEDGER_DEL_W * 0.4 ? -LEDGER_DEL_W : 0, true);
+      }
+      ledgerSwipe = null;
+    }
+
+    ledgerList.addEventListener("pointerup", finishLedgerSwipe);
+    ledgerList.addEventListener("pointercancel", finishLedgerSwipe);
+
+    ledgerList.addEventListener("click", (e) => {
+      const btn = e.target.closest(".ledger-del");
+      if (!btn) return;
+      const item = btn.closest(".ledger-item");
+      if (item) deleteLog(item.dataset.log);
+    });
+
+    ledgerOverlay.addEventListener("pointerdown", (e) => {
+      if (!ledgerSheet.contains(e.target)) closeLedger();
+    });
+
+    document.getElementById("confirm").addEventListener("click", confirmSpend);
+    catSave.addEventListener("click", saveCatSheet);
+    catDelete.addEventListener("click", deleteEditingCat);
+
+    amountEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") confirmSpend();
+    });
+
+    amountEl.addEventListener("input", () => {
+      amountEl.value = amountEl.value.replace(/\D/g, "");
+    });
+
+    catNameEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") saveCatSheet();
+    });
+
+    window.addEventListener("contextmenu", (e) => e.preventDefault());
+    document.addEventListener("touchmove", (e) => {
+      if (dragging || holdTimer || (ledgerSwipe && ledgerSwipe.axis === "h")) e.preventDefault();
+    }, { passive: false });
+
+    let fitTick = 0;
+    function applyViewport() {
+      const vv = window.visualViewport;
+      const h = Math.round((vv && vv.height) || window.innerHeight || document.documentElement.clientHeight);
+      const top = vv ? Math.round(vv.offsetTop) : 0;
+      document.body.style.inset = "auto";
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.top = top + "px";
+      document.body.style.height = h + "px";
+      app.style.height = h + "px";
+      layoutFan();
+    }
+    function fitApp() {
+      if (fitTick) return;
+      fitTick = requestAnimationFrame(() => {
+        fitTick = 0;
+        applyViewport();
+      });
+    }
+
+    window.addEventListener("resize", fitApp);
+    window.addEventListener("pageshow", fitApp);
+    window.visualViewport?.addEventListener("resize", fitApp);
+    window.visualViewport?.addEventListener("scroll", fitApp);
+
+    render();
+    renderCats();
+    fitApp();
+    requestAnimationFrame(fitApp);
+    setTimeout(fitApp, 120);
+    setTimeout(fitApp, 400);
+  </script>
+</body>
+</html>
