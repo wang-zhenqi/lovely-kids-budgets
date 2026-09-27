@@ -5,10 +5,12 @@ alwaysApply: true
 
 # 知识库
 
-本仓库文档入口是 `docs/INDEX.md`。先读它，再读路由点名的一个领域 README，然后只读点名的那几篇。
+本仓库文档入口是 `docs/INDEX.md`。先读它，再只打开该问题的那一个归属。
 
-- 一篇一个种类：`tutorial`、`how-to`、`reference`、`explanation`。
-- 一篇一个读者：`agent`、`developer`、`business`、`leadership`。
+- 产品意图在 `docs/requirements/`。
+- 代码行为在 `docs/domains/`。
+- 实施原则和架构取舍在 `docs/decisions/`。
+- 一篇一个种类：`tutorial`、`how-to`、`reference`、`explanation`。一篇一个读者：`agent`、`developer`、`business`、`leadership`。
 - 正式文档只用 `docs/glossary.md` 中的名称。对话代号先写入术语表。
-- 待办和未核实笔记只写入 `docs/inbox/`。
+- 想法、会议笔记和未完成的计划是原料，放在 `docs/inbox/` 或 `docs/superpowers/`。活动结束前收束并删除原料。
 - 编写、查阅、捕获或整理文档时，遵循技能 `knowledge-base`。

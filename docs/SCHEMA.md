@@ -11,30 +11,45 @@ source: docs/SCHEMA.md
 
 # 文档目录约定
 
-本文件说明目录里各放什么。Agent 的加载、写作、升格和整理步骤在技能 `knowledge-base`，不在这里复述。
+知识库只回答现在可以相信什么。每条事实有一个归属。开发过程里的笔记是原料，收束进归属之后删除。Agent 的操作步骤在技能 `knowledge-base`。
 
-## 目录
+## 三类事实
 
-- `INDEX.md`：任务路由。一行一个任务，指向一个领域入口。
-- `glossary.md`：正式名称。文档里的名词以这里为准。
-- `domains/<领域>/`：该领域的正式文档。一篇只属于一个领域。
-- `decisions/`：跨领域决定。一篇 ADR 一个编号，已接受的「决定」段不改。
-- `inbox/`：待办和未核实笔记。不是正式知识。
-- `archive/`：过时正文。原路径留一段重定向。
+- **意图**：产品决定做成什么样。唯一归属是 `requirements/` 里的正式需求。
+- **行为**：代码现在怎样运行。唯一归属是 `domains/<领域>/`。文档写明 `source` 和 `verified`，并与代码一致。
+- **取舍**：为什么这样选。唯一归属是 `decisions/` 里已接受的 ADR。被取代的 ADR 留在原处，只说明曾经的决定。
 
-领域目前有四个：`kids`（孩子、预算、余额、存钱罐）、`categories`（消费分类）、`ledger`（记账、账本、金额、备注）、`storage`（本地保存）。不要为了凑齐教程、操作指南、参考说明和解释而建空目录。
+意图和行为可以暂时不同。这个差距记在收件箱的待办里，直到改产品决定或改代码。
 
-## 一篇文档
+## 原料
 
-每篇正式文档一份 frontmatter：`title`、`kind`、`audience`、`domain`、`status`、`updated`、`verified`、`source`。
+`inbox/` 和进行中的 `superpowers/` 都不是事实。
+
+- 一句话需求、需求分析、迭代计划、探查、开工、桌面检查、某一次测试记录、回顾：写在 `inbox/`。预期归属写在笔记开头。
+- 当前迭代选了哪些正式需求：只放在 `inbox/now.md` 的链接里。迭代结束时清空。
+- brainstorming 和写计划仍使用 `superpowers/specs/`、`superpowers/plans/`。工作结束后，把事实收进上面三类归属，然后删除这些文件。
+
+不为这些活动另建长期目录。拒绝的想法不保留。成立的想法不在正式需求之外再留一份。
+
+## 其余目录
+
+- `INDEX.md`：按问题指向唯一归属。
+- `glossary.md`：正式名称。
+- `archive/`：已退出的正式文档。原路径只留重定向。原料不进这里，直接删除。
+
+领域目前有 `kids`、`categories`、`ledger`、`storage`。不要为了凑齐四类文档而建空目录。
+
+## 一篇正式文档
+
+frontmatter 包含 `title`、`kind`、`audience`、`domain`、`status`、`updated`。领域文档还包含 `source` 和 `verified`。
 
 - `kind`：`tutorial`、`how-to`、`reference`、`explanation` 之一。
-- `audience`：`agent`、`developer`、`business`、`leadership` 之一。给产品负责人看的材料用 `leadership`。
-- `domain`：领域目录名。本文件、`INDEX.md`、`glossary.md` 用 `meta`。ADR 用 `decisions`。收件箱用 `inbox`。归档说明用 `archive`。
+- `audience`：`agent`、`developer`、`business`、`leadership` 之一。正式需求用 `leadership`。
+- `domain`：领域目录名。本文件和索引、术语表用 `meta`。正式需求用 `requirements`。ADR 用 `decisions`。原料用 `inbox` 或 `superpowers`。
 - `status`：`draft`、`active`、`superseded`、`archived` 之一。
 
-同一事实要给第二个读者时，另写一篇，用链接互指。
+一篇一个种类、一个主读者。第二个读者另写一篇，用链接互指。
 
-## 生命周期
+## 防止腐化
 
-收件箱里的草稿核实之后，移入所属领域或写成新 ADR，并更新 `INDEX.md`。过时的正式文档移到 `archive/`，原处留下指向新路径的短文。已升格或已无用的收件箱条目直接删除。
+每次活动结束时收束原料。改了代码就同时改对应的领域文档。事实若出现在两个文件里，删掉其中一个，或把它改成链接。索引只指向仍然有效的归属。

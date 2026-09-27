@@ -10,9 +10,10 @@ source: docs/SCHEMA.md
 
 # 收件箱
 
-这里存放执行中的待办、问题理解和尚未核实的流程。这里的文件不是正式知识。
+这里的文件不是事实。一句话需求、需求分析、迭代计划笔记、探查、开工、桌面检查、某一次测试记录和回顾都写在这里。
 
-- 待办追加到 [todos.md](todos.md)：下一步、阻塞、日期。
-- 其他笔记写成 `YYYY-MM-DD-主题.md`，frontmatter 的 `status` 为 `draft`，`domain` 为 `inbox`。
+- [now.md](now.md)：当前迭代选中的正式需求，只有链接。迭代结束时清空。
+- [todos.md](todos.md)：还没做完的下一步，一行一件。
+- 其他笔记：`YYYY-MM-DD-主题.md`。开头写上预期归属：`正式需求`、`领域文档`、`ADR` 或 `删除`。
 
-升格时核对 `docs/glossary.md`，把正文移到所属领域或写成新 ADR，更新领域 README 和 `docs/INDEX.md`，然后删除本目录中的原文。步骤在技能 `knowledge-base`。
+活动结束前按技能 `knowledge-base` 收束：事实写入唯一归属，然后删除本目录里的原文。成立的想法不在这里留底。被拒绝的想法不归档。

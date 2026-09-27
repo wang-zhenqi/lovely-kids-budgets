@@ -26,5 +26,6 @@ source: index.html
 | 金额 | 记账时填写的数字 | 输入 `#amount` | ledger |
 | 备注 | 记账时可选的短说明 | 输入 `#note` | ledger |
 | 本地保存 | 浏览器里持久化的应用状态 | `localStorage` 键 `lovely-kids-budget-v1`；函数 `load`、`save`、`normalize` | storage |
+| 正式需求 | 已经决定的产品意图，也称 PRD | `docs/requirements/` | requirements |
 
 本表只固定名称和代码位置。行为规则写在对应领域的正式文档里。
