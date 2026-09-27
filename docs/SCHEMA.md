@@ -4,7 +4,7 @@ kind: reference
 audience: developer
 domain: meta
 status: active
-updated: 2026-09-26
+updated: 2026-09-27
 verified: 2026-09-26
 source: docs/SCHEMA.md
 ---
@@ -13,11 +13,12 @@ source: docs/SCHEMA.md
 
 知识库只回答现在可以相信什么。每条事实有一个归属。开发过程里的笔记是原料，收束进归属之后删除。Agent 的操作步骤在技能 `knowledge-base`。
 
-## 三类事实
+## 事实的归属
 
 - **意图**：产品决定做成什么样。唯一归属是 `requirements/` 里的正式需求。
 - **行为**：代码现在怎样运行。唯一归属是 `domains/<领域>/`。文档写明 `source` 和 `verified`，并与代码一致。
-- **取舍**：为什么这样选。唯一归属是 `decisions/` 里已接受的 ADR。被取代的 ADR 留在原处，只说明曾经的决定。
+- **取舍**：为什么这样选。唯一归属是 `decisions/` 里已接受的 ADR。被取代的 ADR 留在原处，只说明曾经的决定。决定若来自儿童金钱经验，链接 `theory/` 里的那一节，不把文章抄进 ADR。
+- **理论**：以孩子的年龄，怎样的金钱经验站得住。唯一可引用的正文是 `theory/` 里的文章。碎片在 `theory/fragments/`，收进文章后删除。理论不代替意图、行为或取舍。
 
 意图和行为可以暂时不同。这个差距记在收件箱的待办里，直到改产品决定或改代码。
 
@@ -36,6 +37,7 @@ source: docs/SCHEMA.md
 - `INDEX.md`：按问题指向唯一归属。
 - `glossary.md`：正式名称。
 - `archive/`：已退出的正式文档。原路径只留重定向。原料不进这里，直接删除。
+- `theory/`：儿童金钱经验。文章在该目录下，碎片在 `theory/fragments/`。过程见 `theory/如何记下理论.md`。
 
 领域目前有 `kids`、`categories`、`ledger`、`storage`。不要为了凑齐四类文档而建空目录。
 
@@ -45,7 +47,7 @@ frontmatter 包含 `title`、`kind`、`audience`、`domain`、`status`、`update
 
 - `kind`：`tutorial`、`how-to`、`reference`、`explanation` 之一。
 - `audience`：`agent`、`developer`、`business`、`leadership` 之一。正式需求用 `leadership`。
-- `domain`：领域目录名。本文件和索引、术语表用 `meta`。正式需求用 `requirements`。ADR 用 `decisions`。原料用 `inbox` 或 `superpowers`。
+- `domain`：领域目录名。本文件和索引、术语表用 `meta`。正式需求用 `requirements`。理论用 `theory`。ADR 用 `decisions`。原料用 `inbox` 或 `superpowers`。
 - `status`：`draft`、`active`、`superseded`、`archived` 之一。
 
 一篇一个种类、一个主读者。第二个读者另写一篇，用链接互指。

@@ -9,7 +9,7 @@ alwaysApply: true
 
 - 产品意图在 `docs/requirements/`。
 - 代码行为在 `docs/domains/`。
-- 实施原则和架构取舍在 `docs/decisions/`。
+- 实施原则和架构取舍在 `docs/decisions/`。理论文章在 `docs/theory/`，设计正式需求时才读被点名的那一篇。
 - 一篇一个种类：`tutorial`、`how-to`、`reference`、`explanation`。一篇一个读者：`agent`、`developer`、`business`、`leadership`。
 - 正式文档只用 `docs/glossary.md` 中的名称。对话代号先写入术语表。
 - 想法、会议笔记和未完成的计划是原料，放在 `docs/inbox/` 或 `docs/superpowers/`。活动结束前收束并删除原料。

@@ -8,7 +8,7 @@
 
 正式文档只用 `docs/glossary.md` 里的名称。一篇一个种类：`tutorial`、`how-to`、`reference`、`explanation`。一篇一个主读者：`agent`、`developer`、`business`、`leadership`。
 
-产品意图在 `docs/requirements/`。代码行为在 `docs/domains/`。实施原则和架构取舍在 `docs/decisions/`。想法、会议和未完成的计划是原料，放在 `docs/inbox/` 或 `docs/superpowers/`，收束后删除。
+产品意图在 `docs/requirements/`。代码行为在 `docs/domains/`。实施原则和架构取舍在 `docs/decisions/`。儿童金钱经验的文章在 `docs/theory/`，碎片在 `docs/theory/fragments/`。想法、会议和未完成的计划是原料，放在 `docs/inbox/` 或 `docs/superpowers/`，收束后删除。
 
 编写、查阅、捕获或收束文档时，遵循技能 `knowledge-base`。给人看的目录约定在 `docs/SCHEMA.md`。
 

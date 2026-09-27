@@ -4,14 +4,14 @@ kind: reference
 audience: agent
 domain: meta
 status: active
-updated: 2026-09-26
+updated: 2026-09-27
 verified: 2026-09-26
 source: docs/SCHEMA.md
 ---
 
 # 文档路由
 
-先判断问题属于意图、行为还是取舍，再只打开那一个归属。原料不回答「现在是什么」。
+先判断问题属于意图、行为、取舍还是理论，再只打开那一个归属。原料和理论碎片不回答「现在是什么」。
 
 | 问题 | 先读 | 再读 | 不读 |
 | --- | --- | --- | --- |
@@ -21,6 +21,8 @@ source: docs/SCHEMA.md
 | 本地保存现在怎样 | [storage](domains/storage/README.md) | 该领域里被点名的那一篇 | 收件箱、`docs/superpowers/`、其他领域 |
 | 产品决定做成什么样 | [需求](requirements/README.md) | 被点名的那一篇正式需求 | 收件箱、设计说明、实现计划 |
 | 为什么这样选 | [decisions](decisions/README.md) | 已接受的那一篇 ADR | 已取代的 ADR，除非问题是「曾经为什么」 |
+| 记下或整理儿童金钱经验 | [理论](theory/README.md) | [如何记下理论](theory/如何记下理论.md)；已有文章时再加那一篇 | 碎片，除非正在把这一条收进文章 |
+| 设计正式需求时对照儿童金钱经验 | [理论](theory/README.md) | 被点名的那一篇文章 | `theory/fragments/`、已取代的 ADR |
 | 查名称 | [术语表](glossary.md) | 不需要 | 原料 |
 | 记下尚未决定的想法、会议或探查 | [收件箱](inbox/README.md) | `now.md`、`todos.md` 或新建一篇原料 | 不要把原料写成第二个正式文档 |
 | 执行手头这份设计说明或实现计划 | [superpowers](superpowers/README.md) | 正在执行的那一篇 | 其他计划、已收束后应已删除的文件 |

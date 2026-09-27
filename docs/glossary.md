@@ -27,5 +27,7 @@ source: index.html
 | 备注 | 记账时可选的短说明 | 输入 `#note` | ledger |
 | 本地保存 | 浏览器里持久化的应用状态 | `localStorage` 键 `lovely-kids-budget-v1`；函数 `load`、`save`、`normalize` | storage |
 | 正式需求 | 已经决定的产品意图，也称 PRD | `docs/requirements/` | requirements |
+| 理论碎片 | 还不能当依据的一条儿童金钱经验 | `docs/theory/fragments/` | theory |
+| 理论文章 | 已收拢、可供设计正式需求时引用的理论正文 | `docs/theory/` | theory |
 
 本表只固定名称和代码位置。行为规则写在对应领域的正式文档里。
