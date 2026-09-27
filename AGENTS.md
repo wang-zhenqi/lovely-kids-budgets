@@ -16,6 +16,18 @@
 
 尚未决定的内容和待办写入 `docs/inbox/`。当前迭代只在 `docs/inbox/now.md` 列出正式需求链接。活动结束前把事实写入唯一归属，并删除原料。
 
+## Cursor Cloud specific instructions
+
+没有包管理器、lint、测试或构建。安装阶段只确认仓库根目录的 `index.html` 可读：
+
+`python3 -c 'import pathlib; p=pathlib.Path("index.html"); assert p.is_file() and p.stat().st_size>0'`
+
+环境启动时在 8765 端口提供页面。该端口已在监听时，启动命令立刻退出：
+
+`bash -c 'if (echo >/dev/tcp/127.0.0.1/8765) >/dev/null 2>&1; then exit 0; fi; exec python3 -m http.server 8765 --bind 0.0.0.0'`
+
+用浏览器打开 `http://127.0.0.1:8765/`。记一笔账时，把存钱罐拖到消费分类上，再填写金额。
+
 ## 代码入口
 
 领域规则以 `docs/domains/` 为准。下面只标文件入口：
